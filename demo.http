@@ -8,7 +8,7 @@ POST {{url}}/objects
 Content-Type: application/json
 
 {
-  "owner": "7634f69e-b0e2-4239-8844-56a2c0fac95c",
+  "owner": "6fa9dde3-d2e3-497c-a0bf-eef1e2b49e77",
   "name": "My Awesome object"
 }
 
@@ -17,7 +17,7 @@ POST {{url}}/auctions
 Content-Type: application/json
 
 {
-  "objectId": "81a1960c-a0fe-4de7-aa6a-d5e8d60c8e86",
+  "objectId": "c218f6a9-c3c0-4289-92cd-491d998f2385",
   "minimumBid": 50.0,
   "duration": 20
 }
@@ -26,7 +26,7 @@ Content-Type: application/json
 GET {{url}}/auctions/active
 
 ###
-GET {{url}}/auctions/d6ea61e6-ccd9-43a6-b60c-319d9640bedf
+GET {{url}}/auctions/bb300be7-e4fe-4cc7-963f-a3459ad06b80
 
 ###
 POST {{url}}/auctions/e3f05b2a-03d3-4eb7-8594-de475137b0da/bid
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ###
-GET {{url}}/participants/13cc02ce-d1a4-4a8b-b8a0-e5967f8859ef/auctions
+GET {{url}}/participants/6fa9dde3-d2e3-497c-a0bf-eef1e2b49e77/auctions
 
 ###
 

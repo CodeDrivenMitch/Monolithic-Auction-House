@@ -1,20 +1,23 @@
 package com.axoniq.monolith.auctionhouse.rest;
 
 import com.axoniq.monolith.auctionhouse.api.AuctionDto;
-import com.axoniq.monolith.auctionhouse.data.Participant;
-import com.axoniq.monolith.auctionhouse.service.AuctionService;
+import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsForParticipant;
+import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsWithBidsForParticipant;
 import com.axoniq.monolith.auctionhouse.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
+import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("participants")
 public class ParticipantEndpoint {
     private final ParticipantService participantService;
-    private final AuctionService auctionService;
+    private final QueryGateway queryGateway;
 
     @PostMapping
     public String create(@RequestBody CreateRequest request) {
@@ -22,15 +25,13 @@ public class ParticipantEndpoint {
     }
 
     @GetMapping("{id}/auctions")
-    public List<AuctionDto> getAuctionsForParticipant(@PathVariable String id) {
-        Participant participantById = participantService.findParticipantById(id);
-        return auctionService.findAuctionsForParticipant(participantById);
+    public CompletableFuture<List<AuctionDto>> getAuctionsForParticipant(@PathVariable String id) {
+        return queryGateway.query(new GetAllAuctionsForParticipant(id), ResponseTypes.multipleInstancesOf(AuctionDto.class));
     }
 
     @GetMapping("{id}/bids")
-    public List<AuctionDto> getAuctionsWithBidsForParticipant(@PathVariable String id) {
-        Participant participantById = participantService.findParticipantById(id);
-        return auctionService.findAuctionsWithBidsForParticipant(participantById);
+    public CompletableFuture<List<AuctionDto>> getAuctionsWithBidsForParticipant(@PathVariable String id) {
+        return queryGateway.query(new GetAllAuctionsWithBidsForParticipant(id), ResponseTypes.multipleInstancesOf(AuctionDto.class));
     }
 
 

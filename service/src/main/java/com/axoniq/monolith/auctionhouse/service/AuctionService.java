@@ -4,6 +4,7 @@ import com.axoniq.monolith.auctionhouse.api.*;
 import com.axoniq.monolith.auctionhouse.data.*;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.eventhandling.gateway.EventGateway;
+import org.axonframework.queryhandling.QueryHandler;
 import org.jobrunr.scheduling.JobScheduler;
 import org.springframework.stereotype.Service;
 
@@ -101,26 +102,30 @@ public class AuctionService {
         return repository.findById(id).orElseThrow();
     }
 
-    public List<AuctionDto> getActiveAuctions() {
+    @QueryHandler
+    public List<AuctionDto> getActiveAuctions(GetAllActiveAuctions query) {
         return repository.findAllByState(AuctionState.STARTED)
                 .stream()
                 .map(this::toOverviewDto)
                 .toList();
     }
 
-    public AuctionDetailDto getAuctionDetails(String id) {
-        return toDetailDto(findAuctionById(id));
+    @QueryHandler
+    public AuctionDetailDto getAuctionDetails(GetAuctionDetails query) {
+        return toDetailDto(findAuctionById(query.getId()));
     }
 
-    public List<AuctionDto> findAuctionsForParticipant(Participant participantById) {
-        return repository.findAllBySeller(participantById)
+    @QueryHandler
+    public List<AuctionDto> findAuctionsForParticipant(GetAllAuctionsForParticipant query) {
+        return repository.findAllBySeller(query.getId())
                 .stream()
                 .map(this::toOverviewDto)
                 .toList();
     }
 
-    public List<AuctionDto> findAuctionsWithBidsForParticipant(Participant participantById) {
-        return repository.findAllByBidder(participantById)
+    @QueryHandler
+    public List<AuctionDto> findAuctionsWithBidsForParticipant(GetAllAuctionsWithBidsForParticipant query) {
+        return repository.findAllByBidder(query.getId())
                 .stream()
                 .map(this::toOverviewDto)
                 .toList();
