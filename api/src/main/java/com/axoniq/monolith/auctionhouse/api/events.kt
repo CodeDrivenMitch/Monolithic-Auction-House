@@ -29,7 +29,7 @@ data class AuctionReverted(
     val reason: String,
 )
 data class BalanceRemovedFromParticipant(
-    val email: String,
+    val id: String,
     val amount: Double,
     val newBalance: Double,
     val reason: String,

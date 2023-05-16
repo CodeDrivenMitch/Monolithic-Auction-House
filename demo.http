@@ -45,3 +45,7 @@ GET {{url}}/participants/6fa9dde3-d2e3-497c-a0bf-eef1e2b49e77/auctions
 GET {{url}}/participants/a33b9311-5f9c-4fe4-beba-4c824440b4d1/bids
 
 ###
+
+GET {{url}}/participants/a33b9311-5f9c-4fe4-beba-4c824440b4d1/balance
+
+###

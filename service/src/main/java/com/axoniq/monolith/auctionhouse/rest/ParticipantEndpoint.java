@@ -3,6 +3,7 @@ package com.axoniq.monolith.auctionhouse.rest;
 import com.axoniq.monolith.auctionhouse.api.AuctionDto;
 import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsForParticipant;
 import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsWithBidsForParticipant;
+import com.axoniq.monolith.auctionhouse.api.GetBalanceForParticipant;
 import com.axoniq.monolith.auctionhouse.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -32,6 +33,11 @@ public class ParticipantEndpoint {
     @GetMapping("{id}/bids")
     public CompletableFuture<List<AuctionDto>> getAuctionsWithBidsForParticipant(@PathVariable String id) {
         return queryGateway.query(new GetAllAuctionsWithBidsForParticipant(id), ResponseTypes.multipleInstancesOf(AuctionDto.class));
+    }
+
+    @GetMapping("{id}/balance")
+    public CompletableFuture<Double> getBalance(@PathVariable String id) {
+        return queryGateway.query(new GetBalanceForParticipant(id), ResponseTypes.instanceOf(Double.class));
     }
 
 

@@ -4,3 +4,5 @@ class GetAllActiveAuctions
 data class GetAuctionDetails(val id: String)
 data class GetAllAuctionsForParticipant(val id: String)
 data class GetAllAuctionsWithBidsForParticipant(val id: String)
+
+data class GetBalanceForParticipant(val id: String)
