@@ -1,0 +1,47 @@
+POST {{url}}/participants
+Content-Type: application/json
+
+{ "email" : "mitchell2@axoniq.io"}
+
+###
+POST {{url}}/objects
+Content-Type: application/json
+
+{
+  "owner": "54e5e63f-17ef-4930-a6b1-e5813e74e998",
+  "name": "My Awesome object"
+}
+
+###
+POST {{url}}/auctions
+Content-Type: application/json
+
+{
+  "objectId": "f0e8db22-6e02-4bd1-a74d-fdd71c3957df",
+  "minimumBid": 50.0,
+  "duration": 20
+}
+
+###
+GET {{url}}/auctions/active
+
+###
+GET {{url}}/auctions/d6ea61e6-ccd9-43a6-b60c-319d9640bedf
+
+###
+POST {{url}}/auctions/d6ea61e6-ccd9-43a6-b60c-319d9640bedf/bid
+Content-Type: application/json
+
+{
+  "participant": "13cc02ce-d1a4-4a8b-b8a0-e5967f8859ef",
+  "bid": 2
+}
+
+###
+GET {{url}}/participants/13cc02ce-d1a4-4a8b-b8a0-e5967f8859ef/auctions
+
+###
+
+GET {{url}}/participants/13cc02ce-d1a4-4a8b-b8a0-e5967f8859ef/bids
+
+###
