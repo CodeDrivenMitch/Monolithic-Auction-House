@@ -1,8 +1,6 @@
 package com.axoniq.monolith.auctionhouse.service;
 
 import com.axoniq.monolith.auctionhouse.api.*;
-import com.axoniq.monolith.auctionhouse.data.Auction;
-import com.axoniq.monolith.auctionhouse.data.AuctionObject;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;

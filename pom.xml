@@ -17,7 +17,9 @@
     </parent>
 
     <modules>
+        <module>api</module>
         <module>service</module>
+        <module>service-data-analytics</module>
     </modules>
 
     <name>Monolith Auction House Parent</name>
