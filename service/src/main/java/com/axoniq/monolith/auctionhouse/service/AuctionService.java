@@ -3,24 +3,22 @@ package com.axoniq.monolith.auctionhouse.service;
 import com.axoniq.monolith.auctionhouse.api.*;
 import com.axoniq.monolith.auctionhouse.data.*;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.jobrunr.scheduling.JobScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AuctionService {
     private final AuctionRepository repository;
     private final AuctionObjectService objectService;
-    private final DataAnalyticsService dataAnalyticsService;
     private final JobScheduler jobScheduler;
     private final ParticipantService participantService;
-    private final HubspotExporter hubspotExporter;
+    private final EventGateway eventGateway;
 
     public void bidOnAuction(String auctionId, Double bid, String bidder) {
         Auction auction = findAuctionById(auctionId);
@@ -41,7 +39,9 @@ public class AuctionService {
         auction.getBids().add(auctionBid);
         repository.save(auction);
 
-        hubspotExporter.registerToMailingList(bidderParticipant.getEmail());
+        eventGateway.publish(
+                new ParticipantBidOnAuction(auction.getItemToSell().getId(), bidder, bid)
+        );
     }
 
     public String createAuction(String objectId, Double minimumBid, Instant endTime) {
@@ -57,8 +57,11 @@ public class AuctionService {
         auction.setEndTime(endTime);
 
         Auction savedEntity = repository.save(auction);
-        dataAnalyticsService.exportCreate(savedEntity);
         jobScheduler.schedule(endTime, () -> endAuction(auction.getId()));
+
+        eventGateway.publish(
+                new AuctionCreated(auction.getId(), objectId, minimumBid)
+        );
 
         return savedEntity.getId();
     }
@@ -69,15 +72,27 @@ public class AuctionService {
             // Already ended
             return;
         }
-        if (auction.getCurrentBidder() != null && auction.getCurrentBidder().getBalance() >= auction.getCurrentBid()) {
-            dataAnalyticsService.exportAuctionFinished(auction);
+        Participant bidder = auction.getCurrentBidder();
+        if (bidder != null && bidder.getBalance() >= auction.getCurrentBid()) {
             auction.setState(AuctionState.ENDED);
-            auction.getItemToSell().setOwner(auction.getCurrentBidder());
-            auction.getCurrentBidder().setBalance(auction.getCurrentBidder().getBalance() - auction.getCurrentBid());
-            auction.getItemToSell().getOwner().setBalance(auction.getItemToSell().getOwner().getBalance() + auction.getCurrentBid());
+            auction.getItemToSell().setOwner(bidder);
+            bidder.setBalance(bidder.getBalance() - auction.getCurrentBid());
+            Participant owner = auction.getItemToSell().getOwner();
+            owner.setBalance(owner.getBalance() + auction.getCurrentBid());
+
+
+            eventGateway.publish(
+                    new AuctionEnded(auction.getId(), bidder.getId(), auction.getCurrentBid()),
+                    new BalanceAddedToParticipant(owner.getId(), auction.getCurrentBid(), owner.getBalance() + auction.getCurrentBid(), "Sold item in auction: " + auctionId),
+                    new BalanceRemovedFromParticipant(bidder.getId(), auction.getCurrentBid(), bidder.getBalance() - auction.getCurrentBid(), "Bought item in auction: " + auctionId)
+            );
         } else {
-            dataAnalyticsService.exportAuctionFailed(auction);
             auction.setState(AuctionState.REVERTED);
+            if (bidder == null) {
+                eventGateway.publish(new AuctionReverted(auctionId, "No bidder!"));
+            } else {
+                eventGateway.publish(new AuctionReverted(auctionId, "Not enough balance on buyer's account!"));
+            }
         }
         repository.save(auction);
     }

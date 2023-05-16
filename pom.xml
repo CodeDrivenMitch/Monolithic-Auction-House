@@ -27,6 +27,7 @@
         <kotlin.version>1.7.20</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
+        <axon.version>4.7.2</axon.version>
     </properties>
 
     <dependencies>
@@ -35,6 +36,18 @@
             <artifactId>kotlin-stdlib</artifactId>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.axonframework</groupId>
+                <artifactId>axon-bom</artifactId>
+                <version>${axon.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <repositories>
         <repository>

@@ -1,8 +1,11 @@
 package com.axoniq.monolith.auctionhouse.service;
 
+import com.axoniq.monolith.auctionhouse.api.BalanceAddedToParticipant;
+import com.axoniq.monolith.auctionhouse.api.ParticipantRegistered;
 import com.axoniq.monolith.auctionhouse.data.Participant;
 import com.axoniq.monolith.auctionhouse.data.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -11,8 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ParticipantService {
     private final ParticipantRepository repository;
-    private final DataAnalyticsService dataAnalyticsService;
-    private final HubspotExporter hubspotExporter;
+    private final EventGateway eventGateway;
 
     public String registerAsParticipant(String email) {
         Participant participant = new Participant();
@@ -20,8 +22,11 @@ public class ParticipantService {
         participant.setEmail(email);
         participant.setBalance(20.0);
         Participant savedEntity = repository.save(participant);
-        dataAnalyticsService.exportCreate(savedEntity);
-        hubspotExporter.registerToMailingList(email);
+
+        eventGateway.publish(
+                new ParticipantRegistered(participant.getId(), participant.getEmail()),
+                new BalanceAddedToParticipant(participant.getId(), 20.0, 20.0, "Free credits with account creation")
+        );
         return savedEntity.getId();
     }
 
