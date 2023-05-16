@@ -1,11 +1,8 @@
 package com.axoniq.monolith.auctionhouse.rest;
 
-import com.axoniq.monolith.auctionhouse.api.AuctionDto;
-import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsForParticipant;
-import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsWithBidsForParticipant;
-import com.axoniq.monolith.auctionhouse.api.GetBalanceForParticipant;
-import com.axoniq.monolith.auctionhouse.service.ParticipantService;
+import com.axoniq.monolith.auctionhouse.api.*;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +14,12 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @RequestMapping("participants")
 public class ParticipantEndpoint {
-    private final ParticipantService participantService;
     private final QueryGateway queryGateway;
+    private final CommandGateway commandGateway;
 
     @PostMapping
     public String create(@RequestBody CreateRequest request) {
-        return participantService.registerAsParticipant(request.email);
+        return commandGateway.sendAndWait(new RegisterParticipantCommand(request.email));
     }
 
     @GetMapping("{id}/auctions")

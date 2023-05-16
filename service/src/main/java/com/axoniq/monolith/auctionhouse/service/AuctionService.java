@@ -3,6 +3,7 @@ package com.axoniq.monolith.auctionhouse.service;
 import com.axoniq.monolith.auctionhouse.api.*;
 import com.axoniq.monolith.auctionhouse.data.*;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
 import org.axonframework.queryhandling.QueryHandler;
 import org.jobrunr.scheduling.JobScheduler;
@@ -21,17 +22,18 @@ public class AuctionService {
     private final ParticipantService participantService;
     private final EventGateway eventGateway;
 
-    public void bidOnAuction(String auctionId, Double bid, String bidder) {
-        Auction auction = findAuctionById(auctionId);
+    @CommandHandler
+    public void bidOnAuction(BidOnAuctionCommand cmd) {
+        Auction auction = findAuctionById(cmd.getAuctionId());
         if (!auction.getState().equals(AuctionState.STARTED)) {
             throw new IllegalStateException("Auction is no longer active!");
         }
-        Participant bidderParticipant = participantService.findParticipantById(bidder);
+        Participant bidderParticipant = participantService.findParticipantById(cmd.getBidder());
 
-        auction.setCurrentBid(bid);
+        auction.setCurrentBid(cmd.getBid());
         auction.setCurrentBidder(bidderParticipant);
         AuctionBid auctionBid = new AuctionBid();
-        auctionBid.setBid(bid);
+        auctionBid.setBid(cmd.getBid());
         auctionBid.setTime(Instant.now());
         auctionBid.setAuction(auction);
         auctionBid.setId(UUID.randomUUID().toString());
@@ -41,27 +43,28 @@ public class AuctionService {
         repository.save(auction);
 
         eventGateway.publish(
-                new ParticipantBidOnAuction(auction.getItemToSell().getId(), bidder, bid)
+                new ParticipantBidOnAuction(auction.getItemToSell().getId(), cmd.getBidder(), cmd.getBid())
         );
     }
 
-    public String createAuction(String objectId, Double minimumBid, Instant endTime) {
-        AuctionObject objectById = objectService.findObjectById(objectId);
+    @CommandHandler
+    public String createAuction(CreateAuctionCommand cmd) {
+        AuctionObject objectById = objectService.findObjectById(cmd.getObjectId());
         if (repository.existsByStateAndItemToSell(AuctionState.STARTED, objectById)) {
             throw new IllegalStateException("An active auction already exists for object " + objectById.getName());
         }
         Auction auction = new Auction();
         auction.setId(UUID.randomUUID().toString());
         auction.setState(AuctionState.STARTED);
-        auction.setMinimumBid(minimumBid);
+        auction.setMinimumBid(cmd.getMinimumBid());
         auction.setItemToSell(objectById);
-        auction.setEndTime(endTime);
+        auction.setEndTime(cmd.getEndTime());
 
         Auction savedEntity = repository.save(auction);
-        jobScheduler.schedule(endTime, () -> endAuction(auction.getId()));
+        jobScheduler.schedule(cmd.getEndTime(), () -> endAuction(auction.getId()));
 
         eventGateway.publish(
-                new AuctionCreated(auction.getId(), objectId, minimumBid)
+                new AuctionCreated(auction.getId(), cmd.getObjectId(), cmd.getMinimumBid())
         );
 
         return savedEntity.getId();

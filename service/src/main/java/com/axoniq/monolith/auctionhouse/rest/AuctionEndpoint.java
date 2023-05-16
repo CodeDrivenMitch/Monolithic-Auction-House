@@ -1,11 +1,8 @@
 package com.axoniq.monolith.auctionhouse.rest;
 
-import com.axoniq.monolith.auctionhouse.api.AuctionDetailDto;
-import com.axoniq.monolith.auctionhouse.api.AuctionDto;
-import com.axoniq.monolith.auctionhouse.api.GetAllActiveAuctions;
-import com.axoniq.monolith.auctionhouse.api.GetAuctionDetails;
-import com.axoniq.monolith.auctionhouse.service.AuctionService;
+import com.axoniq.monolith.auctionhouse.api.*;
 import lombok.RequiredArgsConstructor;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("auctions")
 public class AuctionEndpoint {
     private final QueryGateway queryGateway;
-    private final AuctionService auctionService;
+    private final CommandGateway commandGateway;
 
     @GetMapping("active")
     public CompletableFuture<List<AuctionDto>> getAuctions() {
@@ -34,12 +31,12 @@ public class AuctionEndpoint {
 
     @PostMapping
     public String create(@RequestBody CreateRequest request) {
-        return auctionService.createAuction(request.objectId, request.minimumBid, Instant.now().plus(request.duration, ChronoUnit.SECONDS));
+        return commandGateway.sendAndWait(new CreateAuctionCommand(request.objectId, request.minimumBid, Instant.now().plus(request.duration, ChronoUnit.SECONDS)));
     }
 
     @PostMapping("{id}/bid")
     public void bid(@PathVariable String id, @RequestBody BidRequest request) {
-        auctionService.bidOnAuction(id, request.bid, request.participant);
+        commandGateway.sendAndWait(new BidOnAuctionCommand(id, request.bid, request.participant));
     }
 
     record CreateRequest(

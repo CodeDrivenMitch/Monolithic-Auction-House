@@ -8,7 +8,7 @@ POST {{url}}/objects
 Content-Type: application/json
 
 {
-  "owner": "6fa9dde3-d2e3-497c-a0bf-eef1e2b49e77",
+  "owner": "2e8a05f4-eadf-4f24-afe4-d474f8bd9ca8",
   "name": "My Awesome object"
 }
 
@@ -17,7 +17,7 @@ POST {{url}}/auctions
 Content-Type: application/json
 
 {
-  "objectId": "c218f6a9-c3c0-4289-92cd-491d998f2385",
+  "objectId": "d703eb2d-9228-4374-9ae1-0b958fdb4f25",
   "minimumBid": 50.0,
   "duration": 20
 }
