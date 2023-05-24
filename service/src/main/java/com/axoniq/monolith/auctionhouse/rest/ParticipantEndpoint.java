@@ -4,6 +4,7 @@ import com.axoniq.monolith.auctionhouse.api.AuctionDto;
 import com.axoniq.monolith.auctionhouse.data.Participant;
 import com.axoniq.monolith.auctionhouse.service.AuctionService;
 import com.axoniq.monolith.auctionhouse.service.ParticipantService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("participants")
+@Transactional
 public class ParticipantEndpoint {
     private final ParticipantService participantService;
     private final AuctionService auctionService;
