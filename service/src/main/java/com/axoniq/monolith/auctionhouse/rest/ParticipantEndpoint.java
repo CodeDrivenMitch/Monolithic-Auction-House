@@ -1,6 +1,7 @@
 package com.axoniq.monolith.auctionhouse.rest;
 
 import com.axoniq.monolith.auctionhouse.api.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -13,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("participants")
+@Transactional
 public class ParticipantEndpoint {
     private final QueryGateway queryGateway;
     private final CommandGateway commandGateway;
