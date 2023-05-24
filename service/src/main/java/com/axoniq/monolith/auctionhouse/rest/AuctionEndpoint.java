@@ -3,6 +3,7 @@ package com.axoniq.monolith.auctionhouse.rest;
 import com.axoniq.monolith.auctionhouse.api.AuctionDetailDto;
 import com.axoniq.monolith.auctionhouse.api.AuctionDto;
 import com.axoniq.monolith.auctionhouse.service.AuctionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("auctions")
+@Transactional
 public class AuctionEndpoint {
     private final AuctionService auctionService;
 

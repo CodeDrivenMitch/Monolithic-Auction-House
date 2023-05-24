@@ -1,7 +1,7 @@
 POST {{url}}/participants
 Content-Type: application/json
 
-{ "email" : "mitchell2@axoniq.io"}
+{ "email" : "amitchell22@axoniq.io"}
 
 ###
 POST {{url}}/objects
