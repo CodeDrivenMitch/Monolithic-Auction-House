@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -98,14 +97,14 @@ public class AuctionService {
     }
 
     public List<AuctionDto> findAuctionsForParticipant(Participant participantById) {
-        return repository.findAllBySeller(participantById)
+        return repository.findAllBySeller(participantById.getId())
                 .stream()
                 .map(this::toOverviewDto)
                 .toList();
     }
 
     public List<AuctionDto> findAuctionsWithBidsForParticipant(Participant participantById) {
-        return repository.findAllByBidder(participantById)
+        return repository.findAllByBidder(participantById.getId())
                 .stream()
                 .map(this::toOverviewDto)
                 .toList();
