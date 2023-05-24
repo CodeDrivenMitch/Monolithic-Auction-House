@@ -5,6 +5,7 @@ import com.axoniq.monolith.auctionhouse.api.AuctionDto;
 import com.axoniq.monolith.auctionhouse.api.GetAllActiveAuctions;
 import com.axoniq.monolith.auctionhouse.api.GetAuctionDetails;
 import com.axoniq.monolith.auctionhouse.service.AuctionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -18,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("auctions")
+@Transactional
 public class AuctionEndpoint {
     private final QueryGateway queryGateway;
     private final AuctionService auctionService;

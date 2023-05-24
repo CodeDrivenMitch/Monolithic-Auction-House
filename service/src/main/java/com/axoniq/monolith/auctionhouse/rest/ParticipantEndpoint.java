@@ -4,6 +4,7 @@ import com.axoniq.monolith.auctionhouse.api.AuctionDto;
 import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsForParticipant;
 import com.axoniq.monolith.auctionhouse.api.GetAllAuctionsWithBidsForParticipant;
 import com.axoniq.monolith.auctionhouse.service.ParticipantService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -15,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("participants")
+@Transactional
 public class ParticipantEndpoint {
     private final ParticipantService participantService;
     private final QueryGateway queryGateway;
